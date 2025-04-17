@@ -109,7 +109,7 @@ void leer_consola(t_log *logger)
 		}
 		else
 		{
-			log_(logger, "Cerrando...");
+			log_info(logger, "Cerrando...");
 			break;
 		}
 	}
