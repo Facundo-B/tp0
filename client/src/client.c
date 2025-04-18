@@ -67,9 +67,10 @@ int main(void)
 	conexion = crear_conexion(ip, puerto);
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
+	enviar_mensaje(valor, conexion);
 
 	// Armamos y enviamos el paquete
-	// paquete(conexion);
+	paquete(conexion, logger);
 
 	terminar_programa(conexion, logger, config);
 
@@ -102,36 +103,63 @@ void leer_consola(t_log *logger)
 	while (true)
 	{
 		leido = readline("> ");
-		if (strcmp(leido, "") != 0)
+
+
+		if ((leido == NULL) || (strcmp(leido, "") == 0))
+		{
+			log_info(logger, "Cerrando...");
+			free(leido);
+			break;
+		}
+		else
 		{
 			log_info(logger, leido);
 			free(leido);
 		}
-		else
-		{
-			log_info(logger, "Cerrando...");
-			break;
-		}
 	}
 	// ¡No te olvides de liberar las lineas antes de regresar!
-	free(leido);
 }
 
-void paquete(int conexion)
+void paquete(int conexion, t_log *logger)
 {
 	// Ahora toca lo divertido!
 	char *leido;
-	t_paquete *paquete;
+	t_paquete *paquete = crear_paquete();
 
 	// Leemos y esta vez agregamos las lineas al paquete
+	while (true)
+	{
+		leido = readline("paquete<- ");
+		if (strcmp(leido, "") != 0)
+		{
+			char *pack_content_log = string_from_format("Se añadió '%s' al paquete", leido);
+			log_info(logger, pack_content_log);
+			free(pack_content_log);
+			agregar_a_paquete(paquete, leido, sizeof(leido));
+
+			free(leido);
+		}
+		else
+		{
+			log_info(logger, "Paquete cerrado.");
+			free(leido);
+			break;
+		}
+	}
+
+	//Envio el paquete al servidor
+
+	enviar_paquete(paquete, conexion);
 
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+	eliminar_paquete(paquete);
 }
 
 void terminar_programa(int conexion, t_log *logger, t_config *config)
 {
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config)
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
+	liberar_conexion(conexion);
 	log_destroy(logger);
 	config_destroy(config);
 }
