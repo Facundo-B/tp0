@@ -104,7 +104,6 @@ void leer_consola(t_log *logger)
 	{
 		leido = readline("> ");
 
-
 		if ((leido == NULL) || (strcmp(leido, "") == 0))
 		{
 			log_info(logger, "Cerrando...");
@@ -135,7 +134,7 @@ void paquete(int conexion, t_log *logger)
 			char *pack_content_log = string_from_format("Se añadió '%s' al paquete", leido);
 			log_info(logger, pack_content_log);
 			free(pack_content_log);
-			agregar_a_paquete(paquete, leido, sizeof(leido));
+			agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 
 			free(leido);
 		}
@@ -147,7 +146,7 @@ void paquete(int conexion, t_log *logger)
 		}
 	}
 
-	//Envio el paquete al servidor
+	// Envio el paquete al servidor
 
 	enviar_paquete(paquete, conexion);
 
